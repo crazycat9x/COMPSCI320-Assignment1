@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Main {
+public class prob1 {
     private static ArrayList<Integer> primeGenerator(int n) {
         boolean[] primeNumbers = new boolean[n + 1];
         ArrayList<Integer> result = new ArrayList<>();
@@ -11,7 +11,6 @@ public class Main {
                 primeNumbers[b] = false;
             }
         }
-
         for (int i = 1; i < primeNumbers.length; i++) {
             if (primeNumbers[i]) result.add(i);
         }
@@ -38,11 +37,31 @@ public class Main {
         return pfe(n, primeNumbers);
     }
 
+    private static String prettyPrint(ArrayList<Integer> uglyPrint) {
+        String result;
+        int count = 0;
+        int prev = uglyPrint.get(0);
+        StringBuilder resultBuilder = new StringBuilder();
+        for (int i : uglyPrint) {
+            if (i == prev) {
+                count++;
+            } else {
+                resultBuilder.append(Integer.toString(prev)).append(count != 1 ? "^" + Integer.toString(count) : "").append("*");
+                prev = i;
+                count = 1;
+            }
+        }
+        result = resultBuilder.toString();
+        result += Integer.toString(prev) + (count != 1 ? "^" + Integer.toString(count) : "");
+        return result;
+    }
+
     public static void main(String[] args) {
         Integer n = Integer.parseInt(args[0]);
         ArrayList<Integer> primeNumbers = primeGenerator(n);
+        System.out.println(String.format("%3s  %s", "k", "pfe(k)"));
         for (int i = 1; i <= n; i++) {
-            System.out.println(String.format("%d %s", i, recursivePfe(i, primeNumbers).toString()));
+            System.out.println(String.format("%3d  %s", i, prettyPrint(recursivePfe(i, primeNumbers))));
         }
     }
 }
