@@ -1,9 +1,9 @@
 import java.util.*;
 
 public class prob1 {
-    private static ArrayList<Integer> primeGenerator(int n) {
+    private static List<Integer> primeGenerator(int n) {
         boolean[] primeNumbers = new boolean[n + 1];
-        ArrayList<Integer> result = new ArrayList<>();
+        List<Integer> result = new ArrayList<>();
         Arrays.fill(primeNumbers, true);
         for (int i = 2; i * i <= n; i++) {
             if (!primeNumbers[i]) continue;
@@ -11,33 +11,34 @@ public class prob1 {
                 primeNumbers[b] = false;
             }
         }
-        for (int i = 1; i < primeNumbers.length; i++) {
+        result.add(1);
+        for (int i = 2; i < primeNumbers.length; i++) {
             if (primeNumbers[i]) result.add(i);
         }
         return result;
     }
 
-    private static ArrayList<Integer> pfe(int n, ArrayList<Integer> primeNumbers) {
-        ArrayList<Integer> result = new ArrayList<>();
+    private static List<Integer> pfe(int n, List<Integer> primeNumbers, List<Integer>[] ComputedValues) {
+        List<Integer> computedValue = ComputedValues[n - 1];
+        if (computedValue != null) return computedValue;
+        List<Integer> result = new ArrayList<>();
         if (primeNumbers.contains(n)) {
             result.add(primeNumbers.indexOf(n) + 1);
+            ComputedValues[n - 1] = result;
             return result;
         }
-        for (Integer i : primeNumbers) {
-            if (i != 1 && n % i == 0 && n / i != 1) {
+        for (int i : primeNumbers) {
+            if (i != 1 && n % i == 0) {
                 result.add(i);
-                result.addAll(pfe(n / i, primeNumbers));
+                result.addAll(pfe(n / i, primeNumbers, ComputedValues));
+                ComputedValues[n - 1] = result;
                 return result;
             }
         }
         return result;
     }
 
-    private static ArrayList<Integer> recursivePfe(int n, ArrayList<Integer> primeNumbers) {
-        return pfe(n, primeNumbers);
-    }
-
-    private static String prettyPrint(ArrayList<Integer> uglyPrint) {
+    private static String prettyPrint(List<Integer> uglyPrint) {
         String result;
         int count = 0;
         int prev = uglyPrint.get(0);
@@ -57,11 +58,19 @@ public class prob1 {
     }
 
     public static void main(String[] args) {
-        Integer n = Integer.parseInt(args[0]);
-        ArrayList<Integer> primeNumbers = primeGenerator(n);
-        System.out.println(String.format("%3s  %s", "k", "pfe(k)"));
-        for (int i = 1; i <= n; i++) {
-            System.out.println(String.format("%3d  %s", i, prettyPrint(recursivePfe(i, primeNumbers))));
+        int n = Integer.parseInt(args[0]);
+        StringBuilder output = new StringBuilder();
+        List<Integer> primeNumbers = primeGenerator(n);
+        List<Integer>[] ComputedValues = new ArrayList[n];
+        for (int i = ComputedValues.length - 1, b = 0; i >= 0; i--, b++) {
+            if (ComputedValues[i] == null) {
+                pfe(n - b, primeNumbers, ComputedValues);
+            }
         }
+        output.append(String.format("%3s  %s", "k", "pfe(k)\n"));
+        for (int i = 0; i < ComputedValues.length; i++) {
+            output.append(String.format("%3d  %s\n", i + 1, prettyPrint(ComputedValues[i])));
+        }
+        System.out.print(output.toString());
     }
 }
