@@ -1,8 +1,7 @@
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class Main {
-    private static ArrayList<Integer> primeGenerator(Integer n) {
+    private static ArrayList<Integer> primeGenerator(int n) {
         boolean[] primeNumbers = new boolean[n + 1];
         ArrayList<Integer> result = new ArrayList<>();
         Arrays.fill(primeNumbers, true);
@@ -13,14 +12,18 @@ public class Main {
             }
         }
 
-        for (int i = 2; i < primeNumbers.length; i++) {
+        for (int i = 1; i < primeNumbers.length; i++) {
             if (primeNumbers[i]) result.add(i);
         }
         return result;
     }
 
-    private static ArrayList<Integer> pfe(Integer n, ArrayList<Integer> primeNumbers) {
+    private static ArrayList<Integer> pfe(int n, ArrayList<Integer> primeNumbers) {
         ArrayList<Integer> result = new ArrayList<>();
+        if (primeNumbers.contains(n)) {
+            result.add(primeNumbers.indexOf(n) + 1);
+            return result;
+        }
         for (Integer i : primeNumbers) {
             if (i != 1 && n % i == 0 && n / i != 1) {
                 result.add(i);
@@ -28,17 +31,18 @@ public class Main {
                 return result;
             }
         }
-        result.add(n);
         return result;
     }
 
-    private static void recursivePfe(Integer n, ArrayList<Integer> primeNumbers) {
-        System.out.println(pfe(n, primeNumbers));
+    private static ArrayList<Integer> recursivePfe(int n, ArrayList<Integer> primeNumbers) {
+        return pfe(n, primeNumbers);
     }
 
     public static void main(String[] args) {
         Integer n = Integer.parseInt(args[0]);
         ArrayList<Integer> primeNumbers = primeGenerator(n);
-        recursivePfe(n, primeNumbers);
+        for (int i = 1; i <= n; i++) {
+            System.out.println(String.format("%d %s", i, recursivePfe(i, primeNumbers).toString()));
+        }
     }
 }
