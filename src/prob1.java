@@ -94,7 +94,7 @@ public class prob1 {
         reader.close();
         StringBuilder output = new StringBuilder();
         List<Integer> primeNumbers = primeGenerator(num);
-        List<Integer>[] ComputedValues = new List[num];
+        @SuppressWarnings("unchecked") List<Integer>[] ComputedValues = (ArrayList<Integer>[]) new ArrayList[num];
         for (int i = ComputedValues.length - 1, b = 0; i >= 0; i--, b++) {
             if (ComputedValues[i] == null) pfe(num - b, primeNumbers, ComputedValues);
         }
