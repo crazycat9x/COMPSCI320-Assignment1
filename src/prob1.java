@@ -1,16 +1,15 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
 
 public class prob1 {
+    private static List<Integer>[] computedValues;
+    private static List<Integer> primeNumbers;
+    private static int computedValuesCompletionCount = 1;
+
     private static int getDigitLength(int n) {
-        if (n >= 100) {
-            return 3;
-        } else {
-            if (n < 10) {
-                return 1;
-            } else {
-                return 2;
-            }
-        }
+        return n >= 100 ? 3 : n < 10 ? 1 : 2;
     }
 
     private static String digitTo3SpacesString(int digit) {
@@ -28,7 +27,6 @@ public class prob1 {
 
     private static String prettyPrint(List<Integer> uglyPrint) {
         String result;
-        Collections.sort(uglyPrint);
         int count = 0;
         int prev = uglyPrint.get(0);
         StringBuilder resultStringBuilder = new StringBuilder();
@@ -67,21 +65,23 @@ public class prob1 {
         return result;
     }
 
-    private static List<Integer> pfe(int n, List<Integer> primeNumbers, List<Integer>[] ComputedValues) {
-        List<Integer> computedValue = ComputedValues[n - 1];
+    private static List<Integer> pfe(int n) {
+        List<Integer> computedValue = computedValues[n - 1];
         if (computedValue != null) return computedValue;
         List<Integer> result = new ArrayList<>();
         if (primeNumbers.contains(n)) {
             result.add(primeNumbers.indexOf(n) + 1);
-            ComputedValues[n - 1] = result;
+            computedValues[n - 1] = result;
+            computedValuesCompletionCount++;
             return result;
         }
         for (int i : primeNumbers) {
             if (i != 1 && n % i == 0) {
                 int temp = primeNumbers.contains(i) ? primeNumbers.indexOf(i) + 1 : i;
                 result.add(temp);
-                result.addAll(pfe(n / i, primeNumbers, ComputedValues));
-                ComputedValues[n - 1] = result;
+                result.addAll(pfe(n / i));
+                computedValues[n - 1] = result;
+                computedValuesCompletionCount++;
                 return result;
             }
         }
@@ -92,17 +92,23 @@ public class prob1 {
         Scanner reader = new Scanner(System.in);
         int num = reader.nextInt();
         reader.close();
+        @SuppressWarnings("unchecked")
+        List<Integer>[] tempComputedValues = (ArrayList<Integer>[]) new ArrayList[num];
+        computedValues = tempComputedValues;
+        computedValues[0] = new ArrayList<Integer>() {{
+            add(1);
+        }};
+        primeNumbers = primeGenerator(num);
         StringBuilder output = new StringBuilder();
-        List<Integer> primeNumbers = primeGenerator(num);
-        @SuppressWarnings("unchecked") List<Integer>[] ComputedValues = (ArrayList<Integer>[]) new ArrayList[num];
-        for (int i = ComputedValues.length - 1, b = 0; i >= 0; i--, b++) {
-            if (ComputedValues[i] == null) pfe(num - b, primeNumbers, ComputedValues);
+        for (int i = computedValues.length - 1, b = 0; i >= 0; i--, b++) {
+            if (computedValues.length == computedValuesCompletionCount) break;
+            pfe(num - b);
         }
         output.append("  k pfe(k)\n");
-        for (int i = 0; i < ComputedValues.length; i++) {
+        for (int i = 0; i < computedValues.length; i++) {
             output.append(digitTo3SpacesString(i + 1))
                     .append(" ")
-                    .append(prettyPrint(ComputedValues[i]))
+                    .append(prettyPrint(computedValues[i]))
                     .append("\n");
         }
         System.out.print(output.toString());
