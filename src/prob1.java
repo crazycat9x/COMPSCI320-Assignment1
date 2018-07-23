@@ -25,6 +25,11 @@ public class prob1 {
         }
     }
 
+    private static void addToComputedValue(List<Integer> value, int index) {
+        computedValues[index - 1] = value;
+        computedValuesCompletionCount++;
+    }
+
     private static String prettyPrint(List<Integer> uglyPrint) {
         String result;
         int count = 0;
@@ -71,17 +76,15 @@ public class prob1 {
         List<Integer> result = new ArrayList<>();
         if (primeNumbers.contains(n)) {
             result.add(primeNumbers.indexOf(n) + 1);
-            computedValues[n - 1] = result;
-            computedValuesCompletionCount++;
+            addToComputedValue(result, n);
             return result;
         }
         for (int i : primeNumbers) {
+            if (i * i > n) break;
             if (i != 1 && n % i == 0) {
-                int temp = primeNumbers.contains(i) ? primeNumbers.indexOf(i) + 1 : i;
-                result.add(temp);
+                result.add(primeNumbers.indexOf(i) + 1);
                 result.addAll(pfe(n / i));
-                computedValues[n - 1] = result;
-                computedValuesCompletionCount++;
+                addToComputedValue(result, n);
                 return result;
             }
         }
